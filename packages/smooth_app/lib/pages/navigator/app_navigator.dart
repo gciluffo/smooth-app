@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,8 @@ import 'package:smooth_app/pages/navigator/error_page.dart';
 import 'package:smooth_app/pages/navigator/external_page.dart';
 import 'package:smooth_app/pages/onboarding/onboarding_flow_navigator.dart';
 import 'package:smooth_app/pages/preferences/user_preferences_page.dart';
+import 'package:smooth_app/pages/prices/price_model.dart';
+import 'package:smooth_app/pages/prices/product_price_add_page.dart';
 import 'package:smooth_app/pages/product/add_new_product_page.dart';
 import 'package:smooth_app/pages/product/edit_product_page.dart';
 import 'package:smooth_app/pages/product/new_product_page.dart';
@@ -192,6 +196,20 @@ class _SmoothGoRouter {
               },
             ),
             GoRoute(
+              path: '${_InternalAppRoutes.PRODUCT_ADD_PRICE}/:productId',
+              builder: (BuildContext context, GoRouterState state) {
+                print('inside GoRoute');
+                final productId = state.pathParameters['productId']!;
+
+                // return ProductPriceAddPage(PriceModel(
+                //   proofType: proofType,
+                //   locations: osmLocations,
+                //   initialProduct: product,
+                //   currency: currency,
+                // ));
+              },
+            ),
+            GoRoute(
               path: '${_InternalAppRoutes.PREFERENCES_PAGE}/:preferenceType',
               builder: (BuildContext context, GoRouterState state) {
                 final String? type = state.pathParameters['preferenceType'];
@@ -249,7 +267,11 @@ class _SmoothGoRouter {
         ),
       ],
       redirect: (BuildContext context, GoRouterState state) {
+        debugPrint('Inside fickknknkn');
+        debugPrint(state.uri.toString());
         final String path = state.matchedLocation;
+        debugPrint(path);
+        debugPrint('After redirect');
 
         // Ignore deep links if the onboarding is not yet completed
         if (state.uri.toString() != _InternalAppRoutes.HOME_PAGE &&
@@ -264,10 +286,12 @@ class _SmoothGoRouter {
         // If a barcode is in the URL, ensure to manually fetch the product
         if (path.isNotEmpty) {
           final int subPaths = path.count('/');
+          debugPrint('Subpaths: $subPaths');
 
           if (subPaths > 1) {
             final String? barcode = _extractProductBarcode(path);
 
+            debugPrint('Barcode: $barcode');
             if (barcode != null) {
               AnalyticsHelper.trackEvent(
                 AnalyticsEvent.productDeepLink,
@@ -289,7 +313,12 @@ class _SmoothGoRouter {
               } else {
                 externalLink = true;
               }
-            } else {
+            } else if (path == _ExternalRoutes.ADD_PRODUCT_PRICE) {
+              debugPrint('Inside the create price link handler');
+              debugPrint(path);
+              return AppRoutes.ADD_PRODUCT_PRICE(state.uri.queryParameters['code']!);
+            }
+             else {
               externalLink = true;
             }
           } else if (path == _ExternalRoutes.MOBILE_APP_DOWNLOAD) {
@@ -348,20 +377,26 @@ class _SmoothGoRouter {
   /// Some examples:
   /// - produit/156164894948
   /// - product/3017620422003/nutella-ferrero
+  /// - prices/add/single?code=5712876724908
   String? _extractProductBarcode(String path) {
     if (path.isEmpty) {
       return null;
     }
 
+    String? barcode;
+
+    if (path.contains('code=')) {
+      barcode = Uri.parse(path).queryParameters['code'];
+    }
+
     final List<String> pathParams = path.split('/').sublist(1);
-
     if (pathParams.length > 1) {
-      final String barcode = pathParams[1];
+      barcode = pathParams[1];
+    }
 
-      // Ensure we only have digits and at least 8 characters
-      if (int.tryParse(barcode) != null && barcode.length >= 8) {
-        return barcode;
-      }
+    // Ensure we only have digits and at least 8 characters
+    if (barcode != null && int.tryParse(barcode) != null && barcode.length >= 8) {
+      return barcode;
     }
 
     return null;
@@ -405,6 +440,7 @@ class _InternalAppRoutes {
   static const String PRODUCT_LOADER_PAGE = '_product_loader';
   static const String PRODUCT_CREATOR_PAGE = '_product_creator';
   static const String PRODUCT_EDITOR_PAGE = '_product_editor';
+  static const String PRODUCT_ADD_PRICE = '_product_add_price';
   static const String PREFERENCES_PAGE = '_preferences';
   static const String SEARCH_PAGE = '_search';
   static const String EXTERNAL_PAGE = '_external';
@@ -419,6 +455,7 @@ class _ExternalRoutes {
   static const String PRODUCT_EDITION = '/cgi/product.pl';
   static const String GUIDE_NUTRISCORE_V2 = '/nutriscore-v2';
   static const String SIGNUP = '/signup';
+  static const String ADD_PRODUCT_PRICE = '/prices/add/single';
 }
 
 /// A list of internal routes to use with [AppNavigator]
@@ -452,6 +489,9 @@ class AppRoutes {
   // Product creator or "add product" feature
   static String PRODUCT_EDITOR(String barcode) =>
       '/${_InternalAppRoutes.PRODUCT_EDITOR_PAGE}/$barcode';
+
+  static String ADD_PRODUCT_PRICE(String barcode) =>
+      '/${_InternalAppRoutes.PRODUCT_ADD_PRICE}/$barcode';
 
   // App preferences
   static String PREFERENCES(PreferencePageType type) =>
