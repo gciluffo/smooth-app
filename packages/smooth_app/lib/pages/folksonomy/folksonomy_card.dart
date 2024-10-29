@@ -1,21 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
-import 'package:smooth_app/generic_lib/buttons/smooth_large_button_with_icon.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/product_cards_helper.dart';
 import 'package:smooth_app/helpers/ui_helpers.dart';
 import 'package:smooth_app/pages/folksonomy/folksonomy_list.dart';
-import 'package:smooth_app/pages/prices/get_prices_model.dart';
-import 'package:smooth_app/pages/prices/price_meta_product.dart';
-import 'package:smooth_app/pages/prices/prices_page.dart';
-import 'package:smooth_app/pages/prices/product_price_add_page.dart';
-import 'package:smooth_app/resources/app_icons.dart';
 import 'package:smooth_app/themes/constant_icons.dart';
-import 'package:smooth_app/themes/smooth_theme_colors.dart';
 
-/// Card that displays buttons related to prices.
 class FolksonomyCard extends StatefulWidget {
   const FolksonomyCard(this.product);
   final Product product;
@@ -26,6 +17,7 @@ class FolksonomyCard extends StatefulWidget {
 
 class _FolksonomyCardState extends State<FolksonomyCard> {
   late Future<Map<String, ProductTag>> _productTagsFuture;
+  late Map<String, ProductTag> _productTags;
 
   @override
   void initState() {
@@ -34,27 +26,19 @@ class _FolksonomyCardState extends State<FolksonomyCard> {
   }
 
   Future<Map<String, ProductTag>> fetchProductTags(String barcode) async {
-    // Replace with your actual API call
-    final response = await FolksonomyAPIClient.getProductTags(barcode: barcode);
-
-    print('the response is $response');
-    print(response);
-
-    return response;
+    return FolksonomyAPIClient.getProductTags(barcode: barcode);
   }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations appLocalizations = AppLocalizations.of(context);
-    final SmoothColorsThemeExtension? themeExtension =
-        Theme.of(context).extension<SmoothColorsThemeExtension>();
 
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => FolksonomyList(),
-          ),
+              builder: (context) =>
+                  FolksonomyList(_productTags, widget.product)),
         );
       },
       child: buildProductSmoothCard(
@@ -69,7 +53,7 @@ class _FolksonomyCardState extends State<FolksonomyCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Text(
-                    'Product Tags',
+                    'Product Tags', // TODO: localize
                     style: Theme.of(context).textTheme.displaySmall,
                   ),
                   const SizedBox(width: SMALL_SPACE),
@@ -104,7 +88,7 @@ class _FolksonomyCardState extends State<FolksonomyCard> {
                                             snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
-                                        return Center(
+                                        return const Center(
                                             child: CircularProgressIndicator());
                                       } else if (snapshot.hasError) {
                                         return Center(
@@ -112,11 +96,12 @@ class _FolksonomyCardState extends State<FolksonomyCard> {
                                                 'Error: ${snapshot.error}'));
                                       } else if (!snapshot.hasData ||
                                           snapshot.data!.isEmpty) {
-                                        return Center(
+                                        return const Center(
                                             child: Text('No tags available'));
                                       } else {
                                         final Map<String, ProductTag> tags =
                                             snapshot.data!;
+                                        _productTags = tags;
                                         final List<MapEntry<String, ProductTag>>
                                             tagEntries = tags.entries.toList();
                                         final List<MapEntry<String, ProductTag>>
