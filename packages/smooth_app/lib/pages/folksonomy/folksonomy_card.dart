@@ -5,6 +5,7 @@ import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/product_cards_helper.dart';
 import 'package:smooth_app/pages/folksonomy/folksonomy_page.dart';
 import 'package:smooth_app/pages/folksonomy/folksonomy_provider.dart';
+import 'package:smooth_app/pages/folksonomy/tag.dart';
 import 'package:smooth_app/themes/constant_icons.dart';
 
 class FolksonomyCard extends StatelessWidget {
@@ -40,8 +41,13 @@ class Card extends StatelessWidget {
                 });
       },
       child: Padding(
-        padding: const EdgeInsets.only(top: SMALL_SPACE),
+        padding: const EdgeInsets.only(top: LARGE_SPACE),
         child: buildProductSmoothCard(
+          title: Stack(
+            children: <Widget>[
+              Center(child: Text('Product Tags')),
+            ],
+          ),
           body: Container(
             width: double.infinity,
             padding: const EdgeInsetsDirectional.all(LARGE_SPACE),
@@ -49,17 +55,6 @@ class Card extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      'Product Tags', // TODO: localize
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                    const SizedBox(width: SMALL_SPACE),
-                  ],
-                ),
-                const SizedBox(height: SMALL_SPACE),
                 CardList(),
               ],
             ),
@@ -114,14 +109,7 @@ class CardList extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: displayTags.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: VERY_SMALL_SPACE),
-                        child: Text(
-                          '${entry.key}: ${entry.value.value}',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      );
+                      return Tag(text: '${entry.key}: ${entry.value.value}');
                     }).toList(),
                   ),
                 ),
