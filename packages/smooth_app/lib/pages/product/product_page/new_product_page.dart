@@ -14,6 +14,7 @@ import 'package:smooth_app/database/local_database.dart';
 import 'package:smooth_app/generic_lib/buttons/smooth_large_button_with_icon.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
 import 'package:smooth_app/helpers/product_compatibility_helper.dart';
+import 'package:smooth_app/pages/folksonomy/folksonomy_card.dart';
 import 'package:smooth_app/pages/preferences/user_preferences_dev_mode.dart';
 import 'package:smooth_app/pages/prices/prices_card.dart';
 import 'package:smooth_app/pages/product/common/product_refresher.dart';
@@ -214,6 +215,7 @@ class ProductPageState extends State<ProductPage>
                 upToDateProduct.website!.trim().isNotEmpty)
               WebsiteCard(upToDateProduct.website!),
             PricesCard(upToDateProduct),
+            FolksonomyCard(upToDateProduct),
             if (userPreferences.getFlag(
                     UserPreferencesDevMode.userPreferencesFlagUserOrderedKP) ??
                 false)
