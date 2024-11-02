@@ -12,7 +12,7 @@ class FolksonomyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<FolksonomyProvider>(
       create: (_) => FolksonomyProvider(product.barcode!),
       child: FolksonomyContent(product),
     );
@@ -24,10 +24,10 @@ class FolksonomyContent extends StatefulWidget {
   final Product product;
 
   @override
-  _FolksonomyContentState createState() => _FolksonomyContentState();
+  FolksonomyContentState createState() => FolksonomyContentState();
 }
 
-class _FolksonomyContentState extends State<FolksonomyContent> {
+class FolksonomyContentState extends State<FolksonomyContent> {
   @override
   void initState() {
     super.initState();
@@ -61,7 +61,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
                   : appLocalizations.edit_tag,
               body: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   TextField(
                     controller: keyController,
                     decoration: InputDecoration(
@@ -94,7 +94,9 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
                         } else {
                           await provider.editTag(oldKey, valueController.text);
                         }
-                        Navigator.of(context).pop();
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
                       }
                     : null,
                 text: appLocalizations.save,
@@ -113,9 +115,9 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
       context: context,
       builder: (BuildContext context) {
         return Wrap(
-          children: [
+          children: <Widget>[
             ListTile(
-              leading: Icon(Icons.edit),
+              leading: const Icon(Icons.edit),
               title: Text(appLocalizations.edit_tag),
               onTap: () {
                 Navigator.pop(context);
@@ -124,7 +126,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.delete),
+              leading: const Icon(Icons.delete),
               title: Text(appLocalizations.remove_tag),
               onTap: () async {
                 Navigator.pop(context);
@@ -140,7 +142,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations appLocalizations = AppLocalizations.of(context);
-    final provider = context.watch<FolksonomyProvider>();
+    final FolksonomyProvider provider = context.watch<FolksonomyProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -159,7 +161,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
                   ),
                   trailing: provider.isAuthorized
                       ? IconButton(
-                          icon: Icon(Icons.more_vert),
+                          icon: const Icon(Icons.more_vert),
                           onPressed: () {
                             _showBottomSheet(
                                 context, appLocalizations, provider,
@@ -177,7 +179,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
               onPressed: () {
                 _showAddEditDialog(context, appLocalizations, provider);
               },
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             )
           : Container(),
     );

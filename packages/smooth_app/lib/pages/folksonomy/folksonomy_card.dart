@@ -15,9 +15,9 @@ class FolksonomyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<FolksonomyProvider>(
       create: (_) => FolksonomyProvider(product.barcode!),
-      child: Container(child: Card(product)),
+      child: Card(product),
     );
   }
 }
@@ -34,13 +34,16 @@ class Card extends StatelessWidget {
       onTap: () {
         Navigator.of(context)
             .push(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (BuildContext context) => FolksonomyPage(product),
               ),
             )
-            .then((completion) => {
-                  Provider.of<FolksonomyProvider>(context, listen: false)
-                      .fetchProductTags(),
+            .then((void completion) => <Set<Future<void>>>{
+                  if (context.mounted)
+                    <Future<void>>{
+                      Provider.of<FolksonomyProvider>(context, listen: false)
+                          .fetchProductTags(),
+                    }
                 });
       },
       child: Padding(
@@ -72,7 +75,7 @@ class CardList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations appLocalizations = AppLocalizations.of(context);
-    final provider = context.watch<FolksonomyProvider>();
+    final FolksonomyProvider provider = context.watch<FolksonomyProvider>();
 
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator.adaptive());
@@ -80,7 +83,7 @@ class CardList extends StatelessWidget {
       return Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: <Widget>[
             Expanded(
               child: Text(
                 appLocalizations.no_product_tags_found_message,
@@ -112,7 +115,8 @@ class CardList extends StatelessWidget {
                   padding: const EdgeInsets.all(SMALL_SPACE),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: displayTags.map((entry) {
+                    children:
+                        displayTags.map((MapEntry<String, ProductTag> entry) {
                       return Tag(text: '${entry.key}: ${entry.value.value}');
                     }).toList(),
                   ),
