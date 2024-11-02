@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/generic_lib/design_constants.dart';
@@ -27,6 +28,8 @@ class Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+
     return InkWell(
       onTap: () {
         Navigator.of(context)
@@ -45,7 +48,7 @@ class Card extends StatelessWidget {
         child: buildProductSmoothCard(
           title: Stack(
             children: <Widget>[
-              Center(child: Text('Product Tags')),
+              Center(child: Text(appLocalizations.product_tags_title)),
             ],
           ),
           body: Container(
@@ -68,6 +71,7 @@ class Card extends StatelessWidget {
 class CardList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     final provider = context.watch<FolksonomyProvider>();
 
     if (provider.isLoading) {
@@ -77,9 +81,9 @@ class CardList extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
-                'No tags found. Tags can be used to better group similar products. Tap to add.', // TODO: localize
+                appLocalizations.no_product_tags_found_message,
                 textAlign: TextAlign.center,
               ),
             ),

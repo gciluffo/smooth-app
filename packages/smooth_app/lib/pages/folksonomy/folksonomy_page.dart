@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/generic_lib/bottom_sheets/smooth_bottom_sheet.dart';
@@ -32,8 +33,9 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
     super.initState();
   }
 
-  void _showAddEditDialog(BuildContext context, FolksonomyProvider provider,
-      {String? oldKey, String? oldValue, String? oldComment}) {
+  void _showAddEditDialog(BuildContext context,
+      AppLocalizations appLocalizations, FolksonomyProvider provider,
+      {String? oldKey, String? oldValue}) {
     final TextEditingController keyController =
         TextEditingController(text: oldKey);
     final TextEditingController valueController =
@@ -54,22 +56,26 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
             });
 
             return SmoothAlertDialog(
-              // TODO: Localize
-              title: oldKey == null ? 'Add Tag' : 'Edit Tag',
+              title: oldKey == null
+                  ? appLocalizations.add_tag
+                  : appLocalizations.edit_tag,
               body: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: keyController,
                     decoration: InputDecoration(
-                      labelText: 'Key',
-                      errorText: isValidKey ? null : 'Invalid key format.',
+                      labelText: appLocalizations.tag_key,
+                      errorText: isValidKey
+                          ? null
+                          : appLocalizations.invalid_key_format,
                     ),
                     enabled: oldKey == null,
                   ),
                   TextField(
                     controller: valueController,
-                    decoration: InputDecoration(labelText: 'Value'),
+                    decoration:
+                        InputDecoration(labelText: appLocalizations.tag_value),
                   ),
                 ],
               ),
@@ -77,7 +83,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                text: 'Cancel',
+                text: appLocalizations.cancel,
               ),
               positiveAction: SmoothActionButton(
                 onPressed: isValidKey
@@ -88,15 +94,10 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
                         } else {
                           await provider.editTag(oldKey, valueController.text);
                         }
-                        if (provider.error != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error: ${provider.error}')),
-                          );
-                        }
                         Navigator.of(context).pop();
                       }
                     : null,
-                text: 'Save',
+                text: appLocalizations.save,
               ),
             );
           },
@@ -105,7 +106,8 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
     );
   }
 
-  void _showBottomSheet(BuildContext context, FolksonomyProvider provider,
+  void _showBottomSheet(BuildContext context, AppLocalizations appLocalizations,
+      FolksonomyProvider provider,
       {required String key, required String value, String? comment}) {
     showSmoothModalSheet(
       context: context,
@@ -114,24 +116,19 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
           children: [
             ListTile(
               leading: Icon(Icons.edit),
-              title: Text('Edit'),
+              title: Text(appLocalizations.edit_tag),
               onTap: () {
                 Navigator.pop(context);
-                _showAddEditDialog(context, provider,
-                    oldKey: key, oldValue: value, oldComment: comment);
+                _showAddEditDialog(context, appLocalizations, provider,
+                    oldKey: key, oldValue: value);
               },
             ),
             ListTile(
               leading: Icon(Icons.delete),
-              title: Text('Delete'),
+              title: Text(appLocalizations.remove_tag),
               onTap: () async {
                 Navigator.pop(context);
                 await provider.deleteTag(key);
-                if (provider.error != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: ${provider.error}')),
-                  );
-                }
               },
             ),
           ],
@@ -142,12 +139,12 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     final provider = context.watch<FolksonomyProvider>();
 
     return Scaffold(
       appBar: AppBar(
-        // TODO: Localize
-        title: Text('Product Tags'),
+        title: Text(appLocalizations.product_tags_title),
       ),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator.adaptive())
@@ -164,7 +161,8 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
                       ? IconButton(
                           icon: Icon(Icons.more_vert),
                           onPressed: () {
-                            _showBottomSheet(context, provider,
+                            _showBottomSheet(
+                                context, appLocalizations, provider,
                                 key: entry.key,
                                 value: entry.value.value,
                                 comment: entry.value.comment);
@@ -177,7 +175,7 @@ class _FolksonomyContentState extends State<FolksonomyContent> {
       floatingActionButton: provider.isAuthorized
           ? FloatingActionButton(
               onPressed: () {
-                _showAddEditDialog(context, provider);
+                _showAddEditDialog(context, appLocalizations, provider);
               },
               child: Icon(Icons.add),
             )
