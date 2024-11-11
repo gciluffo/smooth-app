@@ -7,6 +7,7 @@ import 'package:smooth_app/helpers/product_cards_helper.dart';
 import 'package:smooth_app/pages/folksonomy/folksonomy_page.dart';
 import 'package:smooth_app/pages/folksonomy/folksonomy_provider.dart';
 import 'package:smooth_app/pages/folksonomy/tag.dart';
+import 'package:smooth_app/pages/product/common/product_refresher.dart';
 import 'package:smooth_app/themes/constant_icons.dart';
 
 class FolksonomyCard extends StatelessWidget {
@@ -31,7 +32,17 @@ class Card extends StatelessWidget {
     final AppLocalizations appLocalizations = AppLocalizations.of(context);
 
     return InkWell(
-      onTap: () {
+      onTap: () async {
+        if (!await ProductRefresher().checkIfLoggedIn(
+          context,
+          isLoggedInMandatory: true,
+        )) {
+          return;
+        }
+        if (!context.mounted) {
+          return;
+        }
+
         Navigator.of(context)
             .push(
               MaterialPageRoute<void>(
