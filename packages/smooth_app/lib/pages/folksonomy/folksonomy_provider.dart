@@ -60,7 +60,7 @@ class FolksonomyProvider extends ChangeNotifier {
   Future<void> addTag(String key, String value) async {
     try {
       final String bearerToken = await getBearerToken();
-      // to-do: The addProduct tag method does not yet have a way to add a comment
+      // to-do: The addProduct tag method does not yet have a way to add a comment.
       await FolksonomyAPIClient.addProductTag(
           barcode: barcode, key: key, value: value, bearerToken: bearerToken);
       _productTags?[key] = ProductTag(

@@ -3,7 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_app/generic_lib/bottom_sheets/smooth_bottom_sheet.dart';
-import 'package:smooth_app/generic_lib/dialogs/smooth_alert_dialog.dart';
+import 'package:smooth_app/generic_lib/design_constants.dart';
+import 'package:smooth_app/pages/folksonomy/folksonomy_create_edit_modal.dart';
 import 'package:smooth_app/pages/folksonomy/folksonomy_provider.dart';
 
 class FolksonomyPage extends StatelessWidget {
@@ -14,98 +15,23 @@ class FolksonomyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<FolksonomyProvider>(
       create: (_) => FolksonomyProvider(product.barcode!),
-      child: FolksonomyContent(product),
+      child: _FolksonomyContent(product),
     );
   }
 }
 
-class FolksonomyContent extends StatefulWidget {
-  const FolksonomyContent(this.product);
+class _FolksonomyContent extends StatefulWidget {
+  const _FolksonomyContent(this.product);
   final Product product;
 
   @override
-  FolksonomyContentState createState() => FolksonomyContentState();
+  _FolksonomyContentState createState() => _FolksonomyContentState();
 }
 
-class FolksonomyContentState extends State<FolksonomyContent> {
+class _FolksonomyContentState extends State<_FolksonomyContent> {
   @override
   void initState() {
     super.initState();
-  }
-
-  void _showAddEditDialog(BuildContext context,
-      AppLocalizations appLocalizations, FolksonomyProvider provider,
-      {String? oldKey, String? oldValue}) {
-    final TextEditingController keyController =
-        TextEditingController(text: oldKey);
-    final TextEditingController valueController =
-        TextEditingController(text: oldValue);
-    const String regexString = r'^[a-z0-9_-]+(:[a-z0-9_-]+)*$';
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            bool isValidKey = RegExp(regexString).hasMatch(keyController.text);
-
-            keyController.addListener(() {
-              setState(() {
-                isValidKey = RegExp(regexString).hasMatch(keyController.text);
-              });
-            });
-
-            return SmoothAlertDialog(
-              title: oldKey == null
-                  ? appLocalizations.add_tag
-                  : appLocalizations.edit_tag,
-              body: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextField(
-                    controller: keyController,
-                    decoration: InputDecoration(
-                      labelText: appLocalizations.tag_key,
-                      errorText: isValidKey
-                          ? null
-                          : appLocalizations.invalid_key_format,
-                    ),
-                    enabled: oldKey == null,
-                  ),
-                  TextField(
-                    controller: valueController,
-                    decoration:
-                        InputDecoration(labelText: appLocalizations.tag_value),
-                  ),
-                ],
-              ),
-              negativeAction: SmoothActionButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                text: appLocalizations.cancel,
-              ),
-              positiveAction: SmoothActionButton(
-                onPressed: isValidKey
-                    ? () async {
-                        if (oldKey == null) {
-                          await provider.addTag(
-                              keyController.text, valueController.text);
-                        } else {
-                          await provider.editTag(oldKey, valueController.text);
-                        }
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
-                        }
-                      }
-                    : null,
-                text: appLocalizations.save,
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 
   void _showBottomSheet(BuildContext context, AppLocalizations appLocalizations,
@@ -121,8 +47,16 @@ class FolksonomyContentState extends State<FolksonomyContent> {
               title: Text(appLocalizations.edit_tag),
               onTap: () {
                 Navigator.pop(context);
-                _showAddEditDialog(context, appLocalizations, provider,
-                    oldKey: key, oldValue: value);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return FolksonomyCreateEditModal(
+                      provider: provider,
+                      oldKey: key,
+                      oldValue: value,
+                    );
+                  },
+                );
               },
             ),
             ListTile(
@@ -150,10 +84,12 @@ class FolksonomyContentState extends State<FolksonomyContent> {
       ),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator.adaptive())
-          : ListView(
+          : ListView.builder(
               padding: const EdgeInsets.all(16.0),
-              children: provider.productTags!.entries
-                  .map((MapEntry<String, ProductTag> entry) {
+              itemCount: provider.productTags!.length,
+              itemBuilder: (BuildContext context, int index) {
+                final MapEntry<String, ProductTag> entry =
+                    provider.productTags!.entries.elementAt(index);
                 return ListTile(
                   title: Text(
                     '${entry.key} : ${entry.value.value}',
@@ -172,16 +108,23 @@ class FolksonomyContentState extends State<FolksonomyContent> {
                         )
                       : null,
                 );
-              }).toList(),
+              },
             ),
       floatingActionButton: provider.isAuthorized
           ? FloatingActionButton(
               onPressed: () {
-                _showAddEditDialog(context, appLocalizations, provider);
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return FolksonomyCreateEditModal(
+                      provider: provider,
+                    );
+                  },
+                );
               },
               child: const Icon(Icons.add),
             )
-          : Container(),
+          : EMPTY_WIDGET,
     );
   }
 }

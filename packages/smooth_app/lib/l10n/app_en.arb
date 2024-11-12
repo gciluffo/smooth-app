@@ -830,13 +830,22 @@
         }
     },
     "product_tags_title": "Product Tags",
+    "@product_tags_title": {
+        "description": "The title for showing product tags, aka folksonomy data"
+    },
     "no_product_tags_found_message": "No tags found. Tags can be used to better group similar products. Tap to add.",
+    "@no_product_tags_found_message": {
+        "description": "Message to show if there are no product tags found"
+    },
     "add_tag": "Add Tag",
     "edit_tag": "Edit Tag",
     "remove_tag": "Remove Tag",
     "tag_key": "Key",
     "tag_value": "Value",
     "invalid_key_format": "Invalid key format. Must be lowercase and no spaces.",
+    "@invalid_key_format": {
+        "description": "Message to show if the key value for a new product tag is invalid. This logic is identical to whats being validated in the folksonomy api"
+    },
     "product_internet_error": "Impossible to fetch information about this product due to a network error.",
     "cached_results_from": "Show results from:",
     "@cached_results_from": {
