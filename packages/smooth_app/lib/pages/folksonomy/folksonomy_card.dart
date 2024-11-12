@@ -110,7 +110,9 @@ class _FolksonomyCardList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children:
                       displayTags.map((MapEntry<String, ProductTag> entry) {
-                    return Tag(text: '${entry.key}: ${entry.value.value}');
+                    return Tag(
+                        text:
+                            '${entry.key}${appLocalizations.sep}: ${entry.value.value}');
                   }).toList(growable: false),
                 ),
               ),
