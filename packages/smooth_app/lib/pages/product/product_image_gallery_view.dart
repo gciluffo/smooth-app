@@ -69,7 +69,7 @@ class _ProductImageGalleryViewState extends State<ProductImageGalleryView>
           onPressed: () async {
             AnalyticsHelper.trackProductEdit(
               AnalyticsEditEvents.photos,
-              barcode,
+              upToDateProduct,
               true,
             );
             await confirmAndUploadNewPicture(
