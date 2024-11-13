@@ -215,7 +215,10 @@ class ProductPageState extends State<ProductPage>
                 upToDateProduct.website!.trim().isNotEmpty)
               WebsiteCard(upToDateProduct.website!),
             PricesCard(upToDateProduct),
-            FolksonomyCard(upToDateProduct),
+            if (userPreferences.getFlag(
+                    UserPreferencesDevMode.userPreferencesFlagHideFolksonomy) ==
+                false)
+              FolksonomyCard(upToDateProduct),
             if (userPreferences.getFlag(
                     UserPreferencesDevMode.userPreferencesFlagUserOrderedKP) ??
                 false)
