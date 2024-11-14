@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smooth_app/generic_lib/design_constants.dart';
+import 'package:smooth_app/themes/theme_provider.dart';
 
 class Tag extends StatelessWidget {
   const Tag({super.key, required this.text});
@@ -7,11 +9,11 @@ class Tag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsetsDirectional.symmetric(vertical: 4.0),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 4.0,
-          horizontal: 8.0,
+        padding: const EdgeInsetsDirectional.symmetric(
+          vertical: VERY_SMALL_SPACE,
+          horizontal: SMALL_SPACE,
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
@@ -20,9 +22,7 @@ class Tag extends StatelessWidget {
         child: Text(
           text,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
+                color: context.darkTheme() ? Colors.white : Colors.black,
               ),
         ),
       ),

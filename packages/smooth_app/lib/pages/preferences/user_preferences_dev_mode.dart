@@ -366,10 +366,12 @@ class UserPreferencesDevMode extends AbstractUserPreferences {
         UserPreferencesItemSwitch(
           title: appLocalizations.dev_preferences_show_folksonomy_title,
           value: userPreferences.getFlag(userPreferencesFlagHideFolksonomy) ??
-              false,
+              true,
           onChanged: (bool value) async {
             await userPreferences.setFlag(
-                userPreferencesFlagHideFolksonomy, value);
+              userPreferencesFlagHideFolksonomy,
+              value,
+            );
             _showSuccessMessage();
           },
         ),

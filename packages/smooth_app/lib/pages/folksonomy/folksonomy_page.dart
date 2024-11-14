@@ -29,11 +29,6 @@ class _FolksonomyContent extends StatefulWidget {
 }
 
 class _FolksonomyContentState extends State<_FolksonomyContent> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void _showBottomSheet(BuildContext context, AppLocalizations appLocalizations,
       FolksonomyProvider provider,
       {required String key, required String value, String? comment}) {

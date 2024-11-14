@@ -19,10 +19,10 @@ class FolksonomyCreateEditModal extends StatefulWidget {
 }
 
 class FolksonomyCreateEditModalState extends State<FolksonomyCreateEditModal> {
+  static const String regexString = r'^[a-z0-9_-]+(:[a-z0-9_-]+)*$';
   late TextEditingController keyController;
   late TextEditingController valueController;
   bool isValidKey = true;
-  static const String regexString = r'^[a-z0-9_-]+(:[a-z0-9_-]+)*$';
 
   @override
   void initState() {
